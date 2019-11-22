@@ -9,4 +9,5 @@ add
 2. Clone this repo into `~/mdk/catkin_ws/src`
 3. `cd ~/mdk/catkin-ws $$ catkin_make`
 4. Restart the terminal
-5. Now, you'll be able to do something like `rosrun miro2_examples joints`
+5. Make the files inside `nodes` executable, e.g. `chmod +x joints`
+6. Now, you'll be able to do something like `rosrun miro2_examples joints`
