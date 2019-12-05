@@ -44,6 +44,6 @@ kin_joints.position[yaw] = math.radians(yaw_val)
 
 # Publish joint changes
 while True:
-	pub_kin.publish(kin_joints)
+    pub_kin.publish(kin_joints)
 
 # Take a look at the client_gui.py code (mdk/bin/shared/client_gui.py) for a more detailed use of ROSPy
