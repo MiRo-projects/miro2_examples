@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+# Message types
 from sensor_msgs.msg import JointState
 
 # Other imports
@@ -13,7 +14,7 @@ import numpy as np
 topic_root = "/" + os.getenv("MIRO_ROBOT_NAME")
 
 # Python needs to initialise a ROS node for publishing data
-rospy.init_node("python_pubisher", anonymous=True)
+rospy.init_node("py_pub", anonymous=True)
 
 # Define ROS publisher
 pub_kin = rospy.Publisher(topic_root + "/control/kinematic_joints", JointState, queue_size=0)

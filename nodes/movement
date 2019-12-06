@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+# Message types
 from geometry_msgs.msg import TwistStamped
 
 # Other imports
