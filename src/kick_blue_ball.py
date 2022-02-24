@@ -1,10 +1,10 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 This script makes MiRo look for a blue ball and kick it
 
 The code was tested for Python 2 and 3
-For Python 3 you might need to change the shebang line to
-#!/usr/bin/env python3
+For Python 2 you might need to change the shebang line to
+#!/usr/bin/env python
 """
 # Imports
 ##########################
@@ -37,7 +37,7 @@ class MiRoClient:
     CAM_FREQ = 1  # Number of ticks before camera gets a new frame, increase in case of network lag
     NODE_EXISTS = False  # Disables (True) / Enables (False) rospy.init_node
     SLOW = 0.1  # Radial speed when turning on the spot (rad/s)
-    FAST = 0.7  # Linear speed when kicking the ball (m/s)
+    FAST = 0.4  # Linear speed when kicking the ball (m/s)
     DEBUG = False  # Set to True to enable debug views of the cameras
 
     def reset_head_pose(self):
