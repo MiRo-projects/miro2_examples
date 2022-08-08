@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<!-- The following code is for running the demo for speech recognition on miro using porcupine -->
+<launch>
+    <env name="MIRO_ROBOT_NAME" value="miro">
+    <node ns="miro" name="miro_node" pkg="speech_recognition_porcupine" type="miro_demo" />
+</launch>
