@@ -148,6 +148,8 @@ class ros_porcupine():
 
 		# porcupine access
 		self.access_key = "B+WsqPgG7cJtnh7HwOCw4S264Vx0JncHljCKCbp+euikQIW3Ufqhag=="
+		new_path = "../pkgs/mdk-210921/catkin_ws/src/speech_recognition_porcupine/src"
+		os.chdir(new_path)
 		self.handle = pvporcupine.create(access_key=self.access_key, 
 									keywords=['hey google'],
 									keyword_paths=['processed_data/Good-boy_en_linux_v2_1_0.ppn',
@@ -168,6 +170,5 @@ class ros_porcupine():
 		print ("starting to record audio from the right ear of MiRo")
 
 if __name__ == "__main__":
-
 	main = ros_porcupine()
-	main.loop()
+	main.	loop()

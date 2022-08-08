@@ -6,8 +6,9 @@ import os
 import rospy
 import time
 
-from node_wag_tail import NodeWagTail
+from node_joints import NodeJoints
 from control_odom import MoveMiro
+from node_kinematic_joint import MoveKinematic
 
 class MiroAction:
 
@@ -18,15 +19,16 @@ class MiroAction:
     """
 
     def __init__(self):
-        self.robot_wag = NodeWagTail()
+        self.robot_joint = NodeJoints()
         self.robot_movement = MoveMiro()
+        self.robot_kinematic = MoveKinematic()
         self.topic_base_name = "/" + os.getenv("MIRO_ROBOT_NAME")
 
         # publish
         self.topic = self.topic_base_name + "/core/animal/state"
         self.pub_animal_state = rospy.Publisher(self.topic, miro.msg.animal_state,
         queue_size=0)
-
+        self.eye_pos = np.sin(time.time() * 10)
         #sound
         self.msg = miro.msg.animal_state()
 
@@ -45,10 +47,15 @@ class HeyMiro(MiroAction):
         super().__init__()
 
     def execute(self):
-        angular_velo = 2 * np.pi/3
-        self.robot_movement.set_move_cmd(angular=angular_velo)
+        joint_pos = np.sin(time.time() * 5)
+        self.robot_joint.set_joint_cmd(wag = 0, droop = 0, eyel = self.eye_pos, eyer = self.eye_pos, earl = joint_pos, earr = joint_pos)
+        self.robot_joint.pub_joint()
+        wheel_speed = [2,-2]
+        (dr, dtheta) = miro.lib.wheel_speed2cmd_vel(wheel_speed)
+        self.robot_movement.set_move_cmd(linear = dr, angular=dtheta)
         self.robot_movement.vel_publish()
-
+        self.robot_kinematic.set_move_kinematic(0)
+        self.robot_kinematic.kinematic_publish()
 
 class NoMiro(MiroAction):
 
@@ -71,6 +78,12 @@ class NoMiro(MiroAction):
         self.robot_movement.stop()
         # start making sound
         self.pub_animal_state.publish(self.msg)
+        if self.eye_pos < 0.3:
+            self.eye_pos = 0.3
+        self.robot_joint.set_joint_cmd(wag = 0, droop = 0, eyel = self.eye_pos, eyer = self.eye_pos, earl = -5, earr = -5)
+        self.robot_joint.pub_joint()
+        self.robot_kinematic.set_move_kinematic(1)
+        self.robot_kinematic.kinematic_publish()
 
 class GoodBoy(MiroAction):
 
@@ -94,11 +107,13 @@ class GoodBoy(MiroAction):
         #start making sound
         self.pub_animal_state.publish(self.msg)
         # start wagging tail
-        tail_pos = np.sin(time.time() * 1.8)
-        self.robot_wag.set_wag_cmd(tail_pos)
-        self.robot_wag.pub_wag()
+        joint_pos = np.sin(time.time() * 50)
+        self.robot_joint.set_joint_cmd(wag = joint_pos, droop = 0, eyel = self.eye_pos, eyer = self.eye_pos, earl = joint_pos, earr = joint_pos)
+        self.robot_joint.pub_joint()
+        self.robot_kinematic.set_move_kinematic(0)
+        self.robot_kinematic.kinematic_publish()
 
 if __name__ == "__main__":
     while not rospy.core.is_shutdown():
-        main = HeyMiro()
+        main = GoodBoy()
         main.execute()

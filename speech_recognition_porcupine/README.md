@@ -24,6 +24,7 @@ Demo
 <p> The demo will consist of the MiRo doing a set of actions as a response to the wake word it has detected</p>
 
  - Clone this repository into `~/mdk/catkin_ws/src`
+ - In `speech_recognition_porcupine/src/sound_recongition_porcupine.py`, go to line 151 and set the path by using the full path of `speech_recognition_porcupine/src`
  - Go into the directory and run
  ```
  ./porcupine_miro_demo.sh
