@@ -13,58 +13,12 @@ import numpy as np
 import wave, struct
 import pvporcupine
 from speech_recognition_porcupine.msg import Audio
-import miro2 as miro
-
-# amount to keep the buffer stuffed - larger numbers mean
-# less prone to dropout, but higher latency when we stop
-# streaming. with a read-out rate of 8k, 4000 samples will
-# buffer for half of a second, for instance.
-BUFFER_STUFF_SAMPLES = 4000
-
-# messages larger than this will be dropped by the receiver,
-# however, so - whilst we can stuff the buffer more than this -
-# we can only send this many samples in any single message.
-MAX_STREAM_MSG_SIZE = (4096 - 48)
-
-# using a margin avoids sending many small messages - instead
-# we will send a smaller number of larger messages, at the cost
-# of being less precise in respecting our buffer stuffing target.
-BUFFER_MARGIN = 1000
-BUFFER_MAX = BUFFER_STUFF_SAMPLES + BUFFER_MARGIN
-BUFFER_MIN = BUFFER_STUFF_SAMPLES - BUFFER_MARGIN
-
-# how long to record before playing back in seconds?
-RECORD_TIME = 1
-
-# microphone sample rate (also available at miro2.constants)
-MIC_SAMPLE_RATE = 20000
+from process_audio import ProcessAudio
 
 # sample count
 SAMPLE_COUNT = 640
 
 class ros_porcupine():
-
-	def callback_stream(self, msg):
-
-		self.buffer_space = msg.data[0]
-		self.buffer_total = msg.data[1]
-		self.buffer_stuff = self.buffer_total - self.buffer_space
-
-	def callback_mics(self, msg):
-
-		# if recording
-		if not self.micbuf is None:
-
-			# append mic data to store
-			self.micbuf = np.concatenate((self.micbuf, msg.data))
-
-			# finished recording?
-			if self.micbuf.shape[0] >= SAMPLE_COUNT:
-
-				# start updating records
-				self.outbuf = self.micbuf[:SAMPLE_COUNT]
-				self.micbuf = self.micbuf[SAMPLE_COUNT:]
-				self.startCheck = True 	# check if micbuf is full since the used audio will be deleted from mic buf
 
 	def loop(self):
 		
@@ -73,10 +27,14 @@ class ros_porcupine():
 
 		while not rospy.core.is_shutdown():
 
+			self.micbuf = self.mic_data.micbuf
+			self.outbuf = self.mic_data.outbuf
+			self.startCheck = self.mic_data.startCheck
+
 			if self.startCheck is True:
 				
 				# get audio from left ear of Miro
-				detect_sound = np.reshape(self.outbuf[:, [0]], (-1))
+				detect_sound = np.reshape(self.outbuf[:, [1]], (-1))
 
 				# downsample for playback
 				outbuf = np.zeros((int(SAMPLE_COUNT / 1.25), 0), 'uint16')
@@ -116,8 +74,8 @@ class ros_porcupine():
 
 				# collect data from the micbuf for making audio file for re-listening later
 				detected_sound = np.append(detected_sound, outbuf)
-
-				self.startCheck = False # to show micbuf data has been processed
+				print(len(detect_sound))
+				self.mic_data.startCheck = False # to show micbuf data has been processed
 
 		# save audio file throughout the whole running process
 		outfilename = 'tmp/client_audio.wav'	# audio file location
@@ -134,16 +92,17 @@ class ros_porcupine():
 	
 	def __init__(self):
 
-		# Create robot interface
-		self.interface = miro.lib.RobotInterface()
+		# Initialise node and required objects
+		rospy.init_node("porcupine_sound_recognition")
+		self.mic_data = ProcessAudio()
 
 		# state
-		self.micbuf = np.zeros((0, 4), 'uint16')
-		self.outbuf = None
+		self.micbuf = self.mic_data.micbuf
+		self.outbuf = self.mic_data.outbuf
 		self.buffer_stuff = 0
 		self.playchan = 0
 		self.playsamp = 0
-		self.startCheck = False
+		self.startCheck = self.mic_data.startCheck
 		self.keyword_detected = -1
 
 		# porcupine access
@@ -155,9 +114,6 @@ class ros_porcupine():
 									keyword_paths=['processed_data/Good-boy_en_linux_v2_1_0.ppn',
 									'processed_data/Hey-Miro_en_linux_v2_1_0.ppn',
 									'processed_data/No-Miro_en_linux_v2_1_0.ppn'])
-
-		#subscribe to mics using robot Interface
-		self.interface.register_callback("microphones", self.callback_mics)
 
 		# publish processed words from audio
 		self.topic_base_name = "/"  + os.getenv("MIRO_ROBOT_NAME")

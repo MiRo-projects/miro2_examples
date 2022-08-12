@@ -8,7 +8,7 @@ class SensorAudio(object):
     # update the detected words with the messages being published
     def __init__(self):
         self.detected_word = ""
-        self.topic_base_name = "/" + os.getenv("MIRO_ROBOT_NAME")
+        self.topic_base_name = "/"  + os.getenv("MIRO_ROBOT_NAME")
         self.subscriber = rospy.Subscriber(
             self.topic_base_name + "/audio/detected_words", Audio, self.audio_cb
         )

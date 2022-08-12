@@ -28,7 +28,7 @@ class MiroAction:
         self.topic = self.topic_base_name + "/core/animal/state"
         self.pub_animal_state = rospy.Publisher(self.topic, miro.msg.animal_state,
         queue_size=0)
-        self.eye_pos = np.sin(time.time() * 10)
+        self.eye_pos = np.sin(time.time() * 3)
         #sound
         self.msg = miro.msg.animal_state()
 
@@ -47,7 +47,7 @@ class HeyMiro(MiroAction):
         super().__init__()
 
     def execute(self):
-        joint_pos = np.sin(time.time() * 5)
+        joint_pos = np.sin(time.time())
         self.robot_joint.set_joint_cmd(wag = 0, droop = 0, eyel = self.eye_pos, eyer = self.eye_pos, earl = joint_pos, earr = joint_pos)
         self.robot_joint.pub_joint()
         wheel_speed = [2,-2]
@@ -107,7 +107,7 @@ class GoodBoy(MiroAction):
         #start making sound
         self.pub_animal_state.publish(self.msg)
         # start wagging tail
-        joint_pos = np.sin(time.time() * 50)
+        joint_pos = np.sin(time.time() * 5)
         self.robot_joint.set_joint_cmd(wag = joint_pos, droop = 0, eyel = self.eye_pos, eyer = self.eye_pos, earl = joint_pos, earr = joint_pos)
         self.robot_joint.pub_joint()
         self.robot_kinematic.set_move_kinematic(0)
