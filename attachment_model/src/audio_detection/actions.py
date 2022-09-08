@@ -72,7 +72,6 @@ class ListeningActions(object):
 class ChildListening(ListeningActions):
 
     def __init__(self):
-        rospy.init_node("child_listener")
         starting_accumulation = 0.00
         self.care_detection = rospy.Publisher('/child/care_detection', Care, queue_size=0)
         self.care = Care()
@@ -81,7 +80,6 @@ class ChildListening(ListeningActions):
 class ParentListening(ListeningActions):
     
     def __init__(self):
-        rospy.init_node("parent_listener")
         starting_accumulation = 0.06
         self.care_detection = rospy.Publisher('/parent/care_detection', Care, queue_size=0)
         self.care = Care()

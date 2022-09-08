@@ -25,11 +25,7 @@ class RobotController(object):
         # Set rate for rospy
         self.rate = rospy.Rate(30)
 
-        # initialise node and publisher
-        rospy.init_node('robot_controller')
-        self.controller_pub = rospy.Publisher(
-            '/central_controller', Action, queue_size= 0
-        )
+        # initialise action publisher
         self.action = Action()
 
         # time step for model calculation
@@ -128,6 +124,11 @@ class BothController(RobotController):
         self.action.child_need = 0
         self.action.parent_need = 0
 
+        # initialise publisher
+        self.controller_pub = rospy.Publisher(
+            '/simultaneous_controller', Action, queue_size= 0
+        )
+
         super().__init__(ambivalence, avoidance)
 
     def update_messages(self, child_action = None, parent_action = None, child_need = None, parent_need = None):
@@ -165,6 +166,12 @@ class ChildController(RobotController):
         self.action.physical_distance = 0
         self.action.child_need = 0
         self.action.parent_need = None
+
+        # initialise publisher
+        self.controller_pub = rospy.Publisher(
+            '/child/controller', Action, queue_size= 0
+        )
+
         super().__init__(ambivalence, avoidance)
 
     def update_messages(self, child_action = None, parent_action = None, child_need = None, parent_need = None):
@@ -200,6 +207,12 @@ class ParentController(RobotController):
         self.action.physical_distance = 0
         self.action.child_need = None
         self.action.parent_need = 0
+
+        # initialise publisher
+        self.controller_pub = rospy.Publisher(
+            '/parent/controller', Action, queue_size= 0
+        )
+
         super().__init__(ambivalence, avoidance)
 
     def update_messages(self, child_action = None, parent_action = None, child_need = None, parent_need = None):

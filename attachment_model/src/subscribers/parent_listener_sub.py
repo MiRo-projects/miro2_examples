@@ -3,7 +3,7 @@
 import rospy                            # ROS Python interface
 from attachment_model.msg import Care   # ROS parent listener subscriber
 
-class ParentListner(object):
+class ParentListener(object):
     
     """
         Update with the messages of parent voice detection
