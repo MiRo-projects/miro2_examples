@@ -51,11 +51,15 @@ class Preprocessing(object):
         # decide whether to stream signal or get from existing file
         if not signal is None:
             self.signal = signal
-        else:
+        elif signal is None and not file_location is None:
             with wave.open(file_location, 'r') as wav_file:
                 self.signal = wav_file.readframes(-1)
                 self.signal = np.fromstring(self.signal, 'Int16')
-
+        else:
+            self.signal = None
+            
+        self.activation_func = Accumulator(k=1)
+        
     """
         Set for new signal
     """
@@ -95,6 +99,26 @@ class Preprocessing(object):
         plt.tight_layout()
         plt.show()
     
+    """
+        Plot frequency response for multiple order and range
+    """
+    def plot(self):
+        plt.figure(1)
+        plt.clf()
+        for i in self.filter_range:
+            for order in [3, 6, 9]:
+                b, a = self.butter_bandpass(i[0], i[1], order=order)
+                w, h = freqz(b, a, worN=2000)
+                plt.plot((self.fs * 0.5 / np.pi) * w, abs(h), label="order = %d" % order)
+
+            plt.plot([0, 0.5 * self.fs], [np.sqrt(0.5), np.sqrt(0.5)],
+                    '--', label='sqrt(0.5)')
+            plt.xlabel('Frequency (Hz)')
+            plt.ylabel('Gain')
+            plt.grid(True)
+            plt.legend(loc='best')
+            plt.show()
+
     """
         Butterworth filter
     """
@@ -139,7 +163,7 @@ class Preprocessing(object):
     """
         Processing Zero Crossing Rate or Short Term Energy
     """
-    def process_filtered_signal(self, method = "zcr", filter = True, save = True):
+    def process_filtered_signal(self, method = "zcr", filter = True, save = False):
 
         signal = self.signal
 
@@ -148,15 +172,15 @@ class Preprocessing(object):
             signal = self.get_filtered_signal(save)
 
         # total time of the signal
-        check_frame_seconds = int(len(signal)/self.fs)
+        check_frame_seconds = len(signal)/self.fs
 
         # check whether the signal is eligible in one frame or not
         if check_frame_seconds == self.frame_seconds:
             process_signal = ProcessEnergyZCR(signal, self.fs)
             if method == "zcr":
-                processed_signal = process_signal.calc_ZCR()
+                processed_signal = np.array([process_signal.calc_ZCR()])
             elif method == "ste":
-                processed_signal = process_signal.calc_STE()
+                processed_signal = np.array([process_signal.calc_STE()])
             else:
                 raise Exception("Choose either zcr or ste for method")
 
@@ -179,28 +203,12 @@ class Preprocessing(object):
         # frame length is too short to process
         else:
             raise Exception("frame length must be at least for 0.32ms")
-        return processed_signal
+        return signal, processed_signal
 
     """
-        Plot frequency response for multiple order and range
+        Pass through an accumulator at specific frequency range for MiRo detection.
+        Values and methods can be different for other speeches.
     """
-    def plot(self):
-        plt.figure(1)
-        plt.clf()
-        for i in self.filter_range:
-            for order in [3, 6, 9]:
-                b, a = self.butter_bandpass(i[0], i[1], order=order)
-                w, h = freqz(b, a, worN=2000)
-                plt.plot((self.fs * 0.5 / np.pi) * w, abs(h), label="order = %d" % order)
-
-            plt.plot([0, 0.5 * self.fs], [np.sqrt(0.5), np.sqrt(0.5)],
-                    '--', label='sqrt(0.5)')
-            plt.xlabel('Frequency (Hz)')
-            plt.ylabel('Gain')
-            plt.grid(True)
-            plt.legend(loc='best')
-            plt.show()
-
     @abstractmethod
     def process_miro_detection(self):
         pass
@@ -218,62 +226,32 @@ class ProcessMiRo(Preprocessing):
     """
     def __init__(self, file_location = None, file_name = "processed_audio", signal = None, fs = 16000, frame_size = 512, mass = 2):
         miroSpeechSettings = MiRoSpeech(mass)
+        self.accumulation = np.empty(0)
         filter_range = miroSpeechSettings.getFrequencyList(noFrequency= 3, difference= 100)
         self.store_accumulation = 0
         super().__init__(filter_range, file_location=file_location, file_name= file_name, signal = signal, fs =fs, frame_size=frame_size)
+
+    def set_accumulation(self, accumulation):
+        self.accumulation = accumulation
+        self.activation_func.set_x(accumulation)
 
     """
         Calculate the ste and check if another miro has produced sound through the use of an accumulator
     """
     def process_miro_detection(self, upper_limit = 2500000, filter = True):
         # filter the sound
-        processed_signal = self.process_filtered_signal(method = "ste", filter=filter)
-        processed_signal_length = len(processed_signal)
-        activation_func = Accumulator(k=10)
-        if processed_signal_length >= 1:
-            accumulation = np.empty(0)
-            for signal in processed_signal:
-                if signal > upper_limit:
-                    accumulation = np.append(accumulation, 1)
-                else:   
-                    accumulation = np.append(accumulation,0)
-        else:
-            # set previous accumulation
-            activation_func.set_x(self.store_accumulation)
-            # process new accumulaton
-            if processed_signal > upper_limit:
-                accumulation = activation_func.check_sound(1)
-            else:
-                accumulation = activation_func.check_sound(0)
-            # store accumulation to calculate on the new check
-            self.store_accumulation = accumulation
-        return accumulation
+        filtered_signal, processed_signal = self.process_filtered_signal(method = "ste", filter=filter)
+        mod_data = processed_signal - upper_limit
+        processed_data = np.heaviside(mod_data, 0)
+        for data in processed_data:
+            self.accumulation = np.append(self.accumulation, self.activation_func.check_sound(data))
+        """
+        self.accumulation[-1] > t1:
+            setAllinouttoZero()
+            generateCou(2s)
+            Listen again
 
-if __name__ == "__main__":
-
-    """
-        Multiple file processing
-    """
-     
-    directory = 'tmp'
-    for filename in os.listdir(directory):
-
-        file_location = os.path.join(directory, filename)
-        main = ProcessMiRo(file_location, "filtered_" + filename[:len(filename)-4])
-        print(filename)
-        plt.plot(main.signal)
-        plt.figure()
-        plt.plot(main.process_miro_detection())
-        plt.show()
-
-    """
-        Single file processing
-    """
-    """
-    file_location = 'tmp/miro_sad_noise.wav'
-    filename = 'miro_sad_noise.wav'
-    main = ProcessMiRo(file_location, filename)
-    main.filter_signal_save()
-    main.miro_process(method="ste")
-    """
-    
+        self.accumulation[-1] > t2:
+            print("Happy")
+        """
+        return processed_data, self.accumulation, processed_signal

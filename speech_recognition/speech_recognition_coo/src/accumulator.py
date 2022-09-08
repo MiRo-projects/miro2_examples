@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 
 class Accumulator():
 
-
     """
         Adjust the k,h and z values depending on the func
         k => to adjust rate of decrease`x`
