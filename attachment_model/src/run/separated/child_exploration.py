@@ -5,7 +5,7 @@ import rospy
 
 # set sys path for getting subscriber modules
 import sys
-sys.path.append('../')
+sys.path.append('../../')
 
 # import subscription modules
 from actions.explore import ChildExplore
@@ -21,7 +21,7 @@ class ChildExploration:
     def run(self):
         # to explore
         while not rospy.is_shutdown():
-            if self.child_action.child == 1:
+            if self.child_action.child == 0:
                 self.child_explore.explore()
 
 if __name__ == "__main__":

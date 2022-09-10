@@ -7,16 +7,15 @@
 """
 
 import wave, struct
-import os
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.signal import butter, lfilter, freqz
 from abc import abstractmethod
 
 # import from local file
-from process_zcr_energy import ProcessEnergyZCR
-from miro_speech_behaviour import MiRoSpeech
-from accumulator import Accumulator
+from audio_detection.process_zcr_energy import ProcessEnergyZCR
+from audio_detection.miro_speech_behaviour import MiRoSpeech
+from audio_detection.accumulator import Accumulator
 
 """
     Parent class to filter and process audio

@@ -9,6 +9,12 @@ from std_msgs.msg import UInt32MultiArray   # robot illumination
 from std_msgs.msg import Float32MultiArray  # cosmetic joints
 from geometry_msgs.msg import TwistStamped  # odometry
 
+# import wheel speed conversion
+try:
+    from miro2.lib import wheel_speed2cmd_vel
+except ImportError:
+    from miro2.utils import wheel_speed2cmd_vel
+
 """
     Helper class to publish control over the robot
 """
@@ -74,4 +80,15 @@ class GeneralPub(object):
         vel_cmd = TwistStamped()
         vel_cmd.twist.linear.x = linear
         vel_cmd.twist.angular.z = angular
+        self.vel_pub.publish(vel_cmd)
+
+    """
+        Changes the speed through the use of each wheel
+    """
+    def drive(self, speed_l=0.1, speed_r=0.1):
+        vel_cmd = TwistStamped()
+        wheel_speed = [speed_l, speed_r]
+        (dr, dtheta) = wheel_speed2cmd_vel(wheel_speed)
+        vel_cmd.twist.linear.x = dr
+        vel_cmd.twist.angular.z = dtheta 
         self.vel_pub.publish(vel_cmd)

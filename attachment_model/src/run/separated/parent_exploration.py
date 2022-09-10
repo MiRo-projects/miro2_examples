@@ -5,7 +5,7 @@ import rospy
 
 # set sys path for getting subscriber modules
 import sys
-sys.path.append('../')
+sys.path.append('../../')
 
 # import subscription modules
 from actions.explore import ParentExplore

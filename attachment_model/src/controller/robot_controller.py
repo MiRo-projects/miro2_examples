@@ -6,8 +6,8 @@ import rospy
 import numpy as np
 
 # import required controller modules
-from emotion_controller import BothEmotionController, ParentEmotionController, ChildEmotionController
-from physical_controller import BothPhysicalController, ParentPhysicalController, ChildPhysicalController
+from controller.emotion_controller import BothEmotionController, ParentEmotionController, ChildEmotionController
+from controller.physical_controller import BothPhysicalController, ParentPhysicalController, ChildPhysicalController
 
 # import required messages
 from attachment_model.msg import Action
@@ -126,7 +126,7 @@ class BothController(RobotController):
 
         # initialise publisher
         self.controller_pub = rospy.Publisher(
-            '/simultaneous_controller', Action, queue_size= 0
+            '/simultaneous/controller', Action, queue_size= 0
         )
 
         super().__init__(ambivalence, avoidance)

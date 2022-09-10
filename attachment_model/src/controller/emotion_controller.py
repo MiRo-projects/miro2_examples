@@ -5,13 +5,9 @@
 from abc import abstractmethod
 import rospy
 
-# set sys path for getting subscriber modules
-import sys
-sys.path.append('../')
-
 # import subscriber modules
 from subscribers.child_listener_sub import ChildListener
-from subscribers.parent_listener_sub import ParentListner
+from subscribers.parent_listener_sub import ParentListener
 
 class EmotionController(object):
 
@@ -26,7 +22,7 @@ class BothEmotionController(EmotionController):
 
     def __init__(self):
         self.child_listener = ChildListener()
-        self.parent_listener = ParentListner()
+        self.parent_listener = ParentListener()
         super().__init__()
 
     def emotional_distance(self):
@@ -42,7 +38,7 @@ class BothEmotionController(EmotionController):
 class ParentEmotionController(EmotionController):
 
     def __init__(self):
-        self.parent_listener = ParentListner()
+        self.parent_listener = ParentListener()
         super().__init__()
 
     def emotional_distance(self):

@@ -7,8 +7,8 @@ import rospy
 import numpy as np
 import wave, struct
 import matplotlib.pyplot as plt
-from process_audio import ProcessAudio
-from preprocessing import ProcessMiRo
+from audio_detection.process_audio import ProcessAudio
+from audio_detection.preprocessing import ProcessMiRo
  
 # sample count
 SAMPLE_COUNT = 640	#32 ms

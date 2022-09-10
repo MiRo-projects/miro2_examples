@@ -5,9 +5,8 @@
 
 import sys
 import rospy
-from abc import abstractmethod
-from sound_recognition import RosCooDetection
-from client_drive_voice import controller
+from audio_detection.sound_recognition import RosCooDetection
+from audio_detection.client_drive_voice import controller
 from attachment_model.msg import Care
 
 class ListeningActions(object):
@@ -23,6 +22,7 @@ class ListeningActions(object):
         self.timer = 2
         self.speaker = controller(sys.argv[1:])
         self.listener = RosCooDetection()
+        self.care = Care()
         self.current_accumulation = starting_accumulation
         self.listener.set_accumulation(starting_accumulation)
 
@@ -74,7 +74,6 @@ class ChildListening(ListeningActions):
     def __init__(self):
         starting_accumulation = 0.00
         self.care_detection = rospy.Publisher('/child/care_detection', Care, queue_size=0)
-        self.care = Care()
         super().__init__(starting_accumulation)
 
 class ParentListening(ListeningActions):
@@ -82,5 +81,4 @@ class ParentListening(ListeningActions):
     def __init__(self):
         starting_accumulation = 0.06
         self.care_detection = rospy.Publisher('/parent/care_detection', Care, queue_size=0)
-        self.care = Care()
         super().__init__(starting_accumulation)

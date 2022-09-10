@@ -5,10 +5,6 @@ from abc import abstractmethod
 import rospy
 import numpy as np
 
-# set sys path for getting subscriber modules
-import sys
-sys.path.append('../')
-
 # import some other modules from within this package
 from subscribers.child_pos_sub import ChildPosition
 from subscribers.parent_pos_sub import ParentPosition

@@ -67,11 +67,11 @@ class ListeningActions(object):
 class ChildListening(ListeningActions):
 
     def __init__(self):
-        starting_accumulation = 0.06
+        starting_accumulation = 0
         super().__init__(starting_accumulation)
 
     def action_two(self):
-        print("Happy child: " + self.current_accumulation)
+        print("Happy child: " + str(self.current_accumulation))
 class ParentListening(ListeningActions):
     
     def __init__(self):

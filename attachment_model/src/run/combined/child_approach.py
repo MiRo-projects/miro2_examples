@@ -8,22 +8,22 @@ import sys
 sys.path.append('../../')
 
 # import subscription modules
-from actions.explore import ParentExplore
+from actions.approach import ChildApproach
 from subscribers.action_sub import BothAction   # subscribe from one controller only
 
-class ParentExploration:
+class ChildExploration:
 
     def __init__(self):
-        rospy.init_node('parent_exploration')
-        self.parent_explore = ParentExplore()
+        rospy.init_node('child_approach')
+        self.child_approach = ChildApproach()
         self.action = BothAction()
 
     def run(self):
         # to explore
         while not rospy.is_shutdown():
-            if self.action.parent == 1:
-                self.parent_explore.explore()
+            if self.action.child == 0:
+                self.child_approach.approach()
 
 if __name__ == "__main__":
-    exploration = ParentExploration()
-    exploration.run()
+    approach = ChildApproach()
+    approach.run()
