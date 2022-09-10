@@ -159,18 +159,18 @@ class ChildController(RobotController):
     def __init__(self, ambivalence, avoidance):
         super().__init__(ambivalence, avoidance)
         # initialise objects and variables for physical distance and emotional distance calculation
-        self.physical_distance_controller = ParentPhysicalController()
-        self.emotional_distance_controller = ParentEmotionController()
+        self.physical_distance_controller = ChildPhysicalController()
+        self.emotional_distance_controller = ChildEmotionController()
         self.de = self.emotional_distance_controller.emotional_distance()
         self.dp = self.physical_distance_controller.physical_distance()
 
         # action message
         self.action.child = 0
-        self.action.parent = None
+        self.action.parent = -1
         self.action.emotional_distance = 0
         self.action.physical_distance = 0
         self.action.child_need = 0
-        self.action.parent_need = None
+        self.action.parent_need = -1
 
         # initialise publisher
         self.controller_pub = rospy.Publisher(
@@ -199,17 +199,17 @@ class ParentController(RobotController):
     def __init__(self, ambivalence, avoidance):
         super().__init__(ambivalence, avoidance)
         # initialise objects and variables for physical distance and emotional distance calculation
-        self.physical_distance_controller = ChildPhysicalController()
-        self.emotional_distance_controller = ChildEmotionController()
+        self.physical_distance_controller = ParentPhysicalController()
+        self.emotional_distance_controller = ParentEmotionController()
         self.de = self.emotional_distance_controller.emotional_distance()
         self.dp = self.physical_distance_controller.physical_distance()
 
         # action message
-        self.action.child = None
+        self.action.child = -1
         self.action.parent = 0
         self.action.emotional_distance = 0
         self.action.physical_distance = 0
-        self.action.child_need = None
+        self.action.child_need = -1
         self.action.parent_need = 0
 
         # initialise publisher

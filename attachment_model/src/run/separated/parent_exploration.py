@@ -16,12 +16,12 @@ class ParentExploration:
     def __init__(self):
         rospy.init_node('child_exploration')
         self.parent_explore = ParentExplore()
-        self.parent_action = ParentAction()
+        self.action = ParentAction()
 
     def run(self):
         # to explore
         while not rospy.is_shutdown():
-            if self.parent_action.parent == 1:
+            if self.action.parent == 0:
                 self.parent_explore.explore()
 
 if __name__ == "__main__":

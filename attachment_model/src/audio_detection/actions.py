@@ -40,7 +40,7 @@ class ListeningActions(object):
         # make sound
         self.speaker.loop()
         # rest
-        rospy.sleep(1)
+        rospy.sleep(1.5)
         # start listening
         self.current_accumulation = self.listener.listening(save = False)
         self.care.initiating = False
@@ -49,25 +49,30 @@ class ListeningActions(object):
         Publush care be initialised to be true when threshold two has been exceeded
     """
     def action_two(self):
+        self.current_accumulation = self.listener.listening(save = False, input = 0)
         self.care.initiating = True
 
     """
         Define the actions being done at each threshold
     """
     def action(self):
-        while not rospy.is_shutdown():
-            # see if care needs to be given
-            if self.current_accumulation <= self.threshold1:
-                print("Stuck below threshold 0.05: " + str(self.current_accumulation))
-                self.action_init()
-            elif self.current_accumulation >= self.threshold2:
-                self.action_two()
-            else:
-                print("Threshold 0.05 exceeded: " + str(self.current_accumulation))
-                self.action_one()
-            # publish care after each iteration
-            self.care_detection.publish(self.care)
-
+        # see if care needs to be given
+        if self.current_accumulation <= self.threshold1:
+            print("Stuck below threshold 0.05: " + str(self.current_accumulation))
+            self.action_init()
+        elif self.current_accumulation >= self.threshold2:
+            print(self.current_accumulation)
+            self.action_two()
+        else:
+            print("Threshold 0.05 exceeded: " + str(self.current_accumulation))
+            self.action_one()
+        # publish care after each iteration
+        self.care_detection.publish(self.care)
+    
+    def action_inactive(self):
+        self.current_accumulation = self.listener.listening(save = False, input = 0)
+        print("INACTIVE",self.current_accumulation)
+        
 # Classes are inherited to set some default values for the constructor    
 class ChildListening(ListeningActions):
 

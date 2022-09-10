@@ -15,14 +15,14 @@ class ChildExploration:
 
     def __init__(self):
         rospy.init_node('child_exploration')
-        self.child_explore = ChildExplore()
-        self.child_action = ChildAction()
+        self.explore = ChildExplore()
+        self.action = ChildAction()
 
     def run(self):
         # to explore
         while not rospy.is_shutdown():
-            if self.child_action.child == 0:
-                self.child_explore.explore()
+            if self.action.child == 0:
+                self.explore.explore()
 
 if __name__ == "__main__":
     exploration = ChildExploration()
