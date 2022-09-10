@@ -6,6 +6,7 @@
     getting an image of the signal, its spectral domain plot and its spectrogram plot.
 """
 
+from re import I
 import wave, struct
 import matplotlib.pyplot as plt
 import numpy as np
@@ -57,7 +58,7 @@ class Preprocessing(object):
         else:
             self.signal = None
             
-        self.activation_func = Accumulator(k=1)
+        self.activation_func = Accumulator(k=10)
         
     """
         Set for new signal
@@ -237,13 +238,16 @@ class ProcessMiRo(Preprocessing):
     """
         Calculate the ste and check if another miro has produced sound through the use of an accumulator
     """
-    def process_miro_detection(self, upper_limit = 2500000, filter = True):
+    def process_miro_detection(self, upper_limit = 2500000, filter = True, input = None):
         # filter the sound
         filtered_signal, processed_signal = self.process_filtered_signal(method = "ste", filter=filter)
         mod_data = processed_signal - upper_limit
         processed_data = np.heaviside(mod_data, 0)
         for data in processed_data:
-            self.accumulation = np.append(self.accumulation, self.activation_func.check_sound(data))
+            if input == None:
+                self.accumulation = np.append(self.accumulation, self.activation_func.check_sound(data))
+            else:
+                self.accumulation = np.append(self.accumulation, self.activation_func.check_sound(input = input))
         """
         self.accumulation[-1] > t1:
             setAllinouttoZero()

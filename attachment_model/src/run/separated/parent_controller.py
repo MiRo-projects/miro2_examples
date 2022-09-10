@@ -14,7 +14,7 @@ class ParentControl():
     
     def __init__(self):
         rospy.init_node("parent_controller")
-        self.controller = ParentController()
+        self.controller = ParentController(0, 0)
 
     def run(self):
         self.controller.central_control()

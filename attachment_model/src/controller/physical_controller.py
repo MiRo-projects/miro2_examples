@@ -121,11 +121,9 @@ class ChildPhysicalController(PhysicalController):
 
         # Child position initialisation
         self.child_position = ChildPosition()
-        super.__init__()
+        super().__init__()
         self.x_1 = self.child_position.pos_x
         self.y_1 = self.child_position.pos_y
-
-        super().__init__()
 
     """
         Update a pair of x and y with child position

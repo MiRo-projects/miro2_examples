@@ -15,7 +15,7 @@ SAMPLE_COUNT = 640	#32 ms
 
 class RosCooDetection():
 
-	def listening(self, save = False):
+	def listening(self, save = False, input = None):
 		
 		# loop
 		detected_sound = np.zeros((0, 1), 'uint16')
@@ -44,7 +44,10 @@ class RosCooDetection():
 
 				# set new signal for processing
 				self.processing_data.set_signal(outbuf)
-				processed_data, accumulation, filtered_signal = self.processing_data.process_miro_detection()
+				if input == None:
+					processed_data, accumulation, filtered_signal = self.processing_data.process_miro_detection()
+				else:
+					processed_data, accumulation, filtered_signal = self.processing_data.process_miro_detection(input = input)
 				# collect data from the micbuf for making audio file for re-listening later and also to graph the necessary data
 				detected_sound = np.append(detected_sound, outbuf)		# audio
 				processed_sound = np.append(processed_sound, processed_data)		# ste
