@@ -56,10 +56,10 @@ class PhysicalController(object):
         # Calculate physical distance
         self.dp = self.calculate_physical_distance()
         self.dp = self.dp/10
-        rospy.loginfo("Updated physical distance: " + self.dp)
+        rospy.loginfo("Updated physical distance: " + str(self.dp))
         if self.dp > 1:
             self.dp = 1
-
+        return self.dp
 """
     Sub-class to update necessary distance of both parent and child
 """
@@ -97,9 +97,9 @@ class BothPhysicalController(PhysicalController):
 class ParentPhysicalController(PhysicalController):
 
     def __init__(self):
-
         # Parent position initialisation
         self.parent_position = ParentPosition()
+        super().__init__()
         self.x_2 = self.parent_position.pos_x
         self.y_2 = self.parent_position.pos_y
 
@@ -107,7 +107,6 @@ class ParentPhysicalController(PhysicalController):
         Update a pair of x and y with parent position
     """
     def update_distance(self):
-
         # Parent position update
         self.x_2 = self.parent_position.pos_x
         self.y_2 = self.parent_position.pos_y
@@ -121,6 +120,7 @@ class ChildPhysicalController(PhysicalController):
 
         # Child position initialisation
         self.child_position = ChildPosition()
+        super.__init__()
         self.x_1 = self.child_position.pos_x
         self.y_1 = self.child_position.pos_y
 

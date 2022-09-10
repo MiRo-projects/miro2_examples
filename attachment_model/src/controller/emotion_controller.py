@@ -34,6 +34,7 @@ class BothEmotionController(EmotionController):
         else:
             self.de += (100-self.de)*0.005 
         self.de = self.de/100
+        return self.de
 
 class ParentEmotionController(EmotionController):
 
@@ -49,6 +50,7 @@ class ParentEmotionController(EmotionController):
         else:
             self.de += (100-self.de)*0.005 
         self.de = self.de/100
+        return self.de
 
 class ChildEmotionController(EmotionController):
 
@@ -64,3 +66,4 @@ class ChildEmotionController(EmotionController):
         else:
             self.de += (100-self.de)*0.005 
         self.de = self.de/100
+        return self.de

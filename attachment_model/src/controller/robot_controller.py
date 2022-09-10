@@ -22,6 +22,10 @@ TIME_H_STEP = 0.01
 class RobotController(object):
     def __init__(self, ambivalence, avoidance):
 
+        # set emotion
+        self.ambivalence = ambivalence
+        self.avoidance = avoidance
+
         # Set rate for rospy
         self.rate = rospy.Rate(30)
 
@@ -66,8 +70,8 @@ class RobotController(object):
             self.time += TIME_H_STEP
 
             # set the avoidant and ambivalent
-            self.epsilonAv = self.emotion.avoidant
-            self.epsilonAm = self.emotion.ambivalent
+            self.epsilonAv = self.avoidance
+            self.epsilonAm = self.ambivalence
             
             # update physical and emotional distance
             self.update_distance()
@@ -144,8 +148,8 @@ class BothController(RobotController):
         self.controller_pub.publish(self.action)
 
     def update_distance(self):
-        self.emotional_distance = self.emotional_distance_controller.emotional_distance()
-        self.physical_distance = self.physical_distance_controller.physical_distance()
+        self.de = self.emotional_distance_controller.emotional_distance()
+        self.dp = self.physical_distance_controller.physical_distance()
 
 """
     Calculate action for both child
@@ -153,11 +157,12 @@ class BothController(RobotController):
 class ChildController(RobotController):
 
     def __init__(self, ambivalence, avoidance):
+        super().__init__(ambivalence, avoidance)
         # initialise objects and variables for physical distance and emotional distance calculation
         self.physical_distance_controller = ParentPhysicalController()
         self.emotional_distance_controller = ParentEmotionController()
-        self.emotional_distance = self.emotional_distance_controller.emotional_distance()
-        self.physical_distance_controller = self.physical_distance_controller.physical_distance()
+        self.de = self.emotional_distance_controller.emotional_distance()
+        self.dp = self.physical_distance_controller.physical_distance()
 
         # action message
         self.action.child = 0
@@ -172,8 +177,6 @@ class ChildController(RobotController):
             '/child/controller', Action, queue_size= 0
         )
 
-        super().__init__(ambivalence, avoidance)
-
     def update_messages(self, child_action = None, parent_action = None, child_need = None, parent_need = None):
         # set messages
         self.action.child = child_action
@@ -185,8 +188,8 @@ class ChildController(RobotController):
         self.controller_pub.publish(self.action)
 
     def update_distance(self):
-        self.emotional_distance = self.emotional_distance_controller.emotional_distance()
-        self.physical_distance = self.physical_distance_controller.physical_distance()
+        self.de = self.emotional_distance_controller.emotional_distance()
+        self.dp = self.physical_distance_controller.physical_distance()
 
 """
     Calculate action for both child
@@ -194,11 +197,12 @@ class ChildController(RobotController):
 class ParentController(RobotController):
 
     def __init__(self, ambivalence, avoidance):
+        super().__init__(ambivalence, avoidance)
         # initialise objects and variables for physical distance and emotional distance calculation
         self.physical_distance_controller = ChildPhysicalController()
         self.emotional_distance_controller = ChildEmotionController()
-        self.emotional_distance = self.emotional_distance_controller.emotional_distance()
-        self.physical_distance_controller = self.physical_distance_controller.physical_distance()
+        self.de = self.emotional_distance_controller.emotional_distance()
+        self.dp = self.physical_distance_controller.physical_distance()
 
         # action message
         self.action.child = None
@@ -212,8 +216,6 @@ class ParentController(RobotController):
         self.controller_pub = rospy.Publisher(
             '/parent/controller', Action, queue_size= 0
         )
-
-        super().__init__(ambivalence, avoidance)
 
     def update_messages(self, child_action = None, parent_action = None, child_need = None, parent_need = None):
         # set messages

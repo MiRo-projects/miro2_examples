@@ -4,6 +4,7 @@
 from abc import abstractmethod
 import rospy
 import os
+import time
 
 # import subscribers and modules
 from subscribers.camera_sub import MiRoCamera
@@ -14,7 +15,8 @@ from actions.general_pub import GeneralPub
 # import messages
 from attachment_model.msg import RobotPub
 
-MIN_RANGE = 0.25
+SPEED = 0.5
+MIN_RANGE = 0.5
 
 class MiRoApproach(object):
     def __init__(self):
@@ -34,6 +36,9 @@ class MiRoApproach(object):
         self.new_frame = self.miro_camera.new_frame
         self.range = self.general_sub.range
         self.tag = [None, None]
+        self.start_time = time.time()
+        self.current_time = time.time() - self.start_time
+        self.condition_satisfied = False
 
     """
         Update camera, frame and range
@@ -42,6 +47,7 @@ class MiRoApproach(object):
         self.input_camera = self.miro_camera.input_camera
         self.new_frame = self.miro_camera.new_frame
         self.range = self.general_sub.range
+        self.current_time = time.time() - self.start_time
 
     """
         April tag detection
@@ -58,14 +64,15 @@ class MiRoApproach(object):
         # check all tag if None
         if set_id is None:
             if not self.tag[0] or not self.tag[1]:
-                self.general_pub.drive(0.1, -0.1)
-                self.tag_found = False
+                if ((self.current_time % 2) < 0.2):
+                    self.general_pub.drive(SPEED, -SPEED)
+                    self.tag_found = False
             else:
                 self.tag_found = True
         else:
             # if tag is not found and the tag id is not valid for left and right eye
             if not (self.tag[0] and ((self.tag[0][0].id in set_id) or (self.tag[1][0].id in set_id))):
-                self.general_pub.drive(0.1, -0.1)
+                self.general_pub.drive(SPEED, -SPEED)
                 self.tag_found = False
             else:
                 self.tag_found = True
@@ -76,18 +83,20 @@ class MiRoApproach(object):
     def approach_func(self, set_id = None):
         self.update_variables()
         self.lookForTag(set_id)
-        if self.tag_found == True:
-            if self.tag[0] and self.tag[1]:
-                self.general_pub.drive(0.2, 0.2)
-            # if in left camera turn left
-            elif self.tag[0] and not self.tag[1]:
-                self.general_pub.drive(0, 0.2)
-            # if in right camera turn right
-            elif not self.tag[0] and  self.tag[1]:
-                self.general_pub.drive(0.2, 0)
-            if self.range < MIN_RANGE:
-                self.condition_satisfied = True
-
+        if not self.condition_satisfied:
+            if self.tag_found == True:
+                if self.tag[0] and self.tag[1]:
+                    self.general_pub.drive(SPEED, SPEED)
+                # if in left camera turn left
+                elif self.tag[0] and not self.tag[1]:
+                    self.general_pub.drive(0, SPEED)
+                # if in right camera turn right
+                elif not self.tag[0] and  self.tag[1]:
+                    self.general_pub.drive(SPEED, 0)
+                if self.range < MIN_RANGE:
+                    self.condition_satisfied = True
+        else:
+            print("DONE")
     """
         Approach tag with odom data being published    
     """
@@ -132,7 +141,7 @@ class ChildApproach(MiRoApproach):
 
         # odom message
         self.odom_pos = RobotPub()
-        
+
         super().__init__()
 
     def approach(self):

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import rospy                                # ROS Python interface
-from attachment_model.msg import RobotPos   # ROS parent position message
+from attachment_model.msg import RobotPub   # ROS parent position message
 
 class ParentPosition(object):
     
@@ -12,7 +12,7 @@ class ParentPosition(object):
         self.pos_x = 0
         self.pos_y = 0
         self.subscriber = rospy.Subscriber(
-            "/parent/odom_position", RobotPos, self.parent_cb
+            "/parent/odom_position", RobotPub, self.parent_cb
         )
 
     def parent_cb(self, action_data):
