@@ -4,7 +4,7 @@
 
   <!-- Child -->
   <env name="MIRO_ROBOT_NAME" value="alf" />
-  <env name="MIRO_ROBOT_IP" value="192.168.43.240" />
+  <!--<env name="MIRO_ROBOT_IP" value="192.168.43.240" />-->
   <node ns="miro" name="miro_node" pkg="attachment_model" type="parent_controller.py" />
   <node ns="miro" name="miro_node" pkg="attachment_model" type="parent_listener.py" />
   <node ns="miro" name="miro_node" pkg="attachment_model" type="parent_approach.py" />
