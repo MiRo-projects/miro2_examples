@@ -4,6 +4,7 @@
 from abc import abstractmethod
 import rospy
 import numpy as np
+import time
 
 # import some other modules from within this package
 from subscribers.child_pos_sub import ChildPosition
@@ -13,6 +14,7 @@ from subscribers.parent_pos_sub import ParentPosition
     Parent class for calculating distance
 """
 k  = 0.3
+k_d = 1
 
 class PhysicalController(object):
 
@@ -22,19 +24,21 @@ class PhysicalController(object):
         self.y_1 = 0
         self.x_2 = 0
         self.y_2 = 0
+        self.start_time = time.time()
     
     @abstractmethod
     def update_distance(self):
         pass
 
     """
-        Reset all distances
+        Reset all distances or time
     """
     def reset(self):
         self.x_1 = 0
         self.y_1 = 0
         self.x_2 = 0
         self.y_2 = 0
+        self.start_time
 
     """
         Calculate distance between two points
@@ -56,10 +60,12 @@ class PhysicalController(object):
         self.update_distance()
         # Calculate physical distance
         self.dp = self.calculate_physical_distance()
-        self.dp = np.exp(-k*self.dp)
-        rospy.loginfo("Updated physical distance: " + str(self.dp))
-        if self.dp > 1:
-            self.dp = 1
+        self.dp = 1 - np.exp(-2*self.dp)
+        return self.dp
+
+    def physical_distance_time(self):
+        time_taken = time.time() - self.start_time
+        self.dp = (np.tanh((k_d * time_taken) - 3) + 1)/2
         return self.dp
 """
     Sub-class to update necessary distance of both parent and child

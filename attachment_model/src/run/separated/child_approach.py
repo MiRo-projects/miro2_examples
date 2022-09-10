@@ -30,13 +30,15 @@ class ChildApproacher:
             if self.action.child == 1:
                 if self.approach.condition_satisfied == True:
                     self.sound.initiating = True
+                    self.pub.publish(self.sound)
                 else:
                     self.approach.approach()
                     self.sound.initiating = False
+                    self.pub.publish(self.sound)
             else:
                 self.approach.condition_satisfied = False
                 self.sound.initiating = False
-            self.pub.publish(self.sound)
+                self.pub.publish(self.sound)
 
 if __name__ == "__main__":
     approach = ChildApproacher()

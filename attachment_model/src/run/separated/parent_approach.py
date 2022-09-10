@@ -40,7 +40,16 @@ class ParentApproacher:
                 self.sound.initiating = False
                 print(3)
             self.pub.publish(self.sound)
+    
+    def still_run(self):
+        while not rospy.is_shutdown():
+            if self.action.parent == 1:
+                self.sound.initiating = True
+            else:
+                self.sound.initiating = False
+            self.pub.publish(self.sound)
+            # add gesture to find MiRo
 
 if __name__ == "__main__":
     approach = ParentApproacher()
-    approach.run()
+    approach.still_run()

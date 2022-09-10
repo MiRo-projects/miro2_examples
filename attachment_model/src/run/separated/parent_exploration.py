@@ -23,7 +23,12 @@ class ParentExploration:
         while not rospy.is_shutdown():
             if self.action.parent == 0:
                 self.parent_explore.explore()
+    
+    def still_run(self):
+        while not rospy.is_shutdown():
+            print("Exploring")
+            # add function to find MiRo
 
 if __name__ == "__main__":
     exploration = ParentExploration()
-    exploration.run()
+    exploration.still_run()
