@@ -12,6 +12,8 @@ from subscribers.parent_pos_sub import ParentPosition
 """
     Parent class for calculating distance
 """
+k  = 0.3
+
 class PhysicalController(object):
 
     def __init__(self):
@@ -52,10 +54,9 @@ class PhysicalController(object):
     def physical_distance(self):
         # Update distance
         self.update_distance()
-
         # Calculate physical distance
         self.dp = self.calculate_physical_distance()
-        self.dp = self.dp/10
+        self.dp = np.exp(-k*self.dp)
         rospy.loginfo("Updated physical distance: " + str(self.dp))
         if self.dp > 1:
             self.dp = 1

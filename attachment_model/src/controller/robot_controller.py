@@ -16,7 +16,7 @@ from attachment_model.msg import Action
     This controller can either be independent or interacting with one another
 """
 CONSTANT_A = 1.0
-CONSTANT_B = 0.7
+CONSTANT_B = 0.5
 TIME_H_STEP = 0.01
 
 class RobotController(object):
@@ -102,10 +102,10 @@ class RobotController(object):
         x2 = r[2]   # need change 2
         y2 = r[3]   # need accumulated 2
         # Calculate needs and accumulated neds
-        dx1 = -CONSTANT_A*(4.0*x1**3 - 2.0*x1) - y1 
-        dy1 = CONSTANT_B*x1- self.epsilonAm*(y2 + y1 - self.dp)  - self.epsilonAv*(y2 - y1 - self.de) 
-        dx2 = -CONSTANT_A*(4.0*x2**3 - 2.0*x2) - y2
-        dy2 = CONSTANT_B*x2  - self.epsilonAm*(y2 + y1 + self.dp)  - self.epsilonAv*(y2 - y1 - self.de)
+        dx1 = -CONSTANT_A*(2.0*x1**3 - x1) - y1 
+        dy1 = CONSTANT_B*x1- self.epsilonAm*(self.dp + y1)  - self.epsilonAv*(self.de + y1 ) 
+        dx2 = -CONSTANT_A*(2.0*x2**3 - x2) - y2
+        dy2 = CONSTANT_B*x2  + self.epsilonAm*(self.dp + y2)  - self.epsilonAv*(self.de + y2)
         return np.array([dx1, dy1, dx2, dy2])
 
 """
