@@ -103,9 +103,9 @@ class RobotController(object):
         y2 = r[3]   # need accumulated 2
         # Calculate needs and accumulated neds
         dx1 = -CONSTANT_A*(2.0*x1**3 - x1) - y1 
-        dy1 = CONSTANT_B*x1- self.epsilonAm*(self.dp + y1)  - self.epsilonAv*(self.de + y1 ) 
+        dy1 = 0.3*(CONSTANT_B*x1- self.epsilonAm*(self.dp + y1)  - self.epsilonAv*(self.de + y1 )) 
         dx2 = -CONSTANT_A*(2.0*x2**3 - x2) - y2
-        dy2 = CONSTANT_B*x2  + self.epsilonAm*(self.dp + y2)  - self.epsilonAv*(self.de + y2)
+        dy2 = 0.3*(CONSTANT_B*x2  + self.epsilonAm*(self.dp + y2)  - self.epsilonAv*(self.de + y2) )
         return np.array([dx1, dy1, dx2, dy2])
 
     def reset_phyiscal_distance(self):

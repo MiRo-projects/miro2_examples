@@ -5,6 +5,7 @@
 
 from abc import abstractmethod
 import sys
+import time
 import rospy
 from audio_detection.sound_recognition import RosCooDetection
 from audio_detection.client_drive_voice import controller
@@ -41,7 +42,9 @@ class ListeningActions(object):
         # make sound
         self.speaker.loop()
         # rest
-        rospy.sleep(1.5)
+        start_time = time.time()
+        while time.time() - start_time < 1.5:
+            self.current_accumulation = self.listener.listening(save = False, input = 0)
         # start listening
         self.current_accumulation = self.listener.listening(save = False)
         self.care.initiating = False

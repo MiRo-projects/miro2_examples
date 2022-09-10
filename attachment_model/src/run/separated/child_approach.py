@@ -19,7 +19,7 @@ class ChildApproacher:
         self.approach = ChildApproach()
         self.action = ChildAction()
         # initialise publisher
-        self.pub = rospy.Publisher(
+        self.pub_sound = rospy.Publisher(
             '/child/approacher_action', Care, queue_size= 0
         )
         self.sound = Care()
@@ -30,15 +30,16 @@ class ChildApproacher:
             if self.action.child == 1:
                 if self.approach.condition_satisfied == True:
                     self.sound.initiating = True
-                    self.pub.publish(self.sound)
+                    self.pub_sound.publish(self.sound)
                 else:
                     self.approach.approach()
                     self.sound.initiating = False
-                    self.pub.publish(self.sound)
+                    self.pub_sound.publish(self.sound)
             else:
                 self.approach.condition_satisfied = False
                 self.sound.initiating = False
-                self.pub.publish(self.sound)
+                self.pub_sound.publish(self.sound)
+            print(self.sound.initiating)
 
 if __name__ == "__main__":
     approach = ChildApproacher()

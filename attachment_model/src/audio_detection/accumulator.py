@@ -32,7 +32,7 @@ class Accumulator():
     """
     def accumulator_func(self):
         # to calculate the change in x
-        f = lambda x, input: -self.k*x + input + self.z*np.random.randn()
+        f = lambda x, input: -self.k*x + 10*input + self.z*np.random.randn()
         self.curr_x = self.curr_x + self.h*f(self.curr_x, self.input)
     
     """
