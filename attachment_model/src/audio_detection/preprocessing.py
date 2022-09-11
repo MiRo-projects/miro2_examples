@@ -58,7 +58,7 @@ class Preprocessing(object):
         else:
             self.signal = None
             
-        self.activation_func = Accumulator(k=5)
+        self.activation_func = Accumulator()
         
     """
         Set for new signal
