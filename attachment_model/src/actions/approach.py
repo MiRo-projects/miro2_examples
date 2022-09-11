@@ -16,7 +16,7 @@ from actions.general_pub import GeneralPub
 from attachment_model.msg import RobotPub
 
 SPEED = 0.5
-MIN_RANGE = 0.5
+MIN_RANGE = 0.35
 
 class MiRoApproach(object):
     def __init__(self):
