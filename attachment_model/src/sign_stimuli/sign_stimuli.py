@@ -56,12 +56,15 @@ class Client:
         
         self.attend = Attend()
         self.orient = Orient()
+        rospy.init_node("sign_stimuli", anonymous=True)
+        print("Hello world")
 
     def loop(self):
+        while not rospy.core.is_shutdown():
             
-        target, cv = self.attend.activate()
-        self.orient.activate( target, cv )
-        time.sleep(0.02)
+            target, cv = self.attend.activate()
+            self.orient.activate( target, cv )
+            time.sleep(0.02)
             
 
 if __name__ == "__main__":
