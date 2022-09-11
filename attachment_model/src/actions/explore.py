@@ -96,7 +96,7 @@ class ParentExplore(MiRoExplore):
 
         # child publisher
         self.odom_publisher = rospy.Publisher(
-            self.topic_base_name + '/parent/odom_position', RobotPub, queue_size= 0
+            '/parent/odom_position', RobotPub, queue_size= 0
         )
         super().__init__()
 
@@ -115,7 +115,7 @@ class ChildExplore(MiRoExplore):
 
         # child publisher
         self.odom_publisher = rospy.Publisher(
-            self.topic_base_name + '/child/odom_position', RobotPub, queue_size= 0
+            '/child/odom_position', RobotPub, queue_size= 0
         )
         super().__init__()
 

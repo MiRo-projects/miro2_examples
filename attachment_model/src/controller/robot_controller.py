@@ -75,6 +75,7 @@ class RobotController(object):
             
             # update physical and emotional distance
             self.update_distance()
+            print(self.dp, self.de)
 
             calculated_need_accumulation = [self.dx1, self.dy1, self.dx2, self.dy2]
             
@@ -120,8 +121,8 @@ class BothController(RobotController):
         # initialise objects and variables for physical distance and emotional distance calculation
         self.physical_distance_controller = BothPhysicalController()
         self.emotional_distance_controller = BothEmotionController()
-        self.emotional_distance = self.emotional_distance_controller.emotional_distance()
-        self.physical_distance = self.physical_distance_controller.physical_distance()
+        self.de = self.emotional_distance_controller.emotional_distance()
+        self.dp = self.physical_distance_controller.physical_distance()
 
         # action message
         self.action.child = 0
@@ -236,8 +237,8 @@ class ParentController(RobotController):
         self.controller_pub.publish(self.action)
 
     def update_distance(self):
-        self.emotional_distance = self.emotional_distance_controller.emotional_distance()
-        self.physical_distance = self.physical_distance_controller.physical_distance_time()
+        self.de = self.emotional_distance_controller.emotional_distance()
+        self.dp = self.physical_distance_controller.physical_distance_time()
 
 if __name__ == '__main__':
     main = RobotController()

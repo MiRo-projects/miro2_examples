@@ -50,6 +50,7 @@ class PhysicalController(object):
         x_2 = np.square(x)
         y_2 = np.square(y)
         p_d = np.sqrt(x_2 + y_2)
+        print("POS:", x, y)
         return p_d
 
     """
@@ -65,7 +66,7 @@ class PhysicalController(object):
 
     def physical_distance_time(self):
         time_taken = time.time() - self.start_time
-        self.dp = (np.tanh((k_d * time_taken) - 3) + 1)/2
+        self.dp = (1 - np.tanh((k_d * time_taken) - 3))/2
         return self.dp
 """
     Sub-class to update necessary distance of both parent and child
@@ -139,4 +140,5 @@ class ChildPhysicalController(PhysicalController):
         # Child position update
         self.x_1 = self.child_position.pos_x
         self.y_1 = self.child_position.pos_y
+        print("HI", self.x_1, self.y_1)
     
