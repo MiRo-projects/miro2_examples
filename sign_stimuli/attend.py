@@ -100,18 +100,24 @@ class Attend:
         self.image_h = frame.shape[0]
 
         # Calculate Optical Flow
-        p1, st, err = cv2.calcOpticalFlowPyrLK(
-            self.old_gray[imageno], frame_gray, self.p0[imageno], None, **lk_params
-        )
+        try:
+            p1, st, err = cv2.calcOpticalFlowPyrLK(
+                self.old_gray[imageno], frame_gray, self.p0[imageno], None, **lk_params
+            )
+        except:
+            return None, 0
 
         target = None
         vf =  0
 
         if p1 is None:
             self.p0[imageno] = cv2.goodFeaturesToTrack(self.old_gray[imageno], mask=None, **feature_params)
-            p1, st, err = cv2.calcOpticalFlowPyrLK(
-            self.old_gray[imageno], frame_gray, self.p0[imageno], None, **lk_params
-            )
+            try:
+                p1, st, err = cv2.calcOpticalFlowPyrLK(
+                self.old_gray[imageno], frame_gray, self.p0[imageno], None, **lk_params
+                )
+            except:
+                return None, 0
 
         # Select good points
         good_new = p1[st == 1]
