@@ -46,104 +46,28 @@ from orient import *
 from attend import *
 
 
-
 ################################################################
 
 
 ################################################################
-
-
 
 class Client:
-
-    def callback_caml(self, ros_image):
-
-       self.callback_cam(ros_image, 0)
-
-    def callback_camr(self, ros_image):
-    
-       self.callback_cam(ros_image, 1)
-
-    def callback_cam(self, ros_image, imno):
-    
-        # silently (ish) handle corrupted JPEG frames
-        try:
-            # convert compressed ROS image to raw CV image
-            self.image[imno] = self.image_converter.compressed_imgmsg_to_cv2(ros_image, "rgb8")
-        except CvBridgeError as e:
-            # print(e)
-            pass
-       
-   
-
-    def loop(self):
-        
-
-        while not rospy.core.is_shutdown():
-            # print(self.moving_hold)
-            ip1 = ip2 = None
-            v1 = v2 = 0
-
-            if self.image[0] is not None:
-                ip1, v1 = self.attend.activate(self.image[0], 0)
-            if self.image[1] is not None:
-                ip2, v2 = self.attend.activate(self.image[1], 1)            
-            
-            target = 0.0
-            cv = 0.0 
-
-            if ip2 is not None or np.abs(v2) > np.abs(v1):
-                target = 0 if ip2 == 0 else 1
-                cv = v2
-            elif ip1 is not None or np.abs(v1) > np.abs(v2):
-                target = -1 if ip1 == 0 else 0
-                cv  = v1
-            else:
-                cv = 0.0
-
-            # print("Movement in: ", cip, ", vel: ", cv, ", active: ", self.orient.active)
-
-            self.orient.activate( target, cv )          
-        
-            self.image = [None, None]
-            time.sleep(0.02)
-
-
     def __init__(self, args):
-    
         
         self.attend = Attend()
         self.orient = Orient()
-        self.image = [None, None]
-        self.image_w = 640
-        self.image_h = 0
-        self.initial_point = np.array([0, 0])
-        self.current_vel = 0
-        self.t = 0.0
-        self.curr_pos = np.radians(0.0)
-        self.idx = 0
-
         rospy.init_node("sign_stimuli", anonymous=True)
-        # ROS -> OpenCV converter
-        self.image_converter = CvBridge()
-
-        # robot name
-        topic_base_name = "/" + os.getenv("MIRO_ROBOT_NAME")
-
-        # subscribe
-        self.sub_caml = rospy.Subscriber(topic_base_name + "/sensors/caml/compressed",
-                                         CompressedImage, self.callback_caml, queue_size=1, tcp_nodelay=True)
-        self.sub_camr = rospy.Subscriber(topic_base_name + "/sensors/camr/compressed",
-                                         CompressedImage, self.callback_camr, queue_size=1, tcp_nodelay=True)
-
         print("Hello world")
 
-
+    def loop(self):
+        while not rospy.core.is_shutdown():
+            
+            target, cv = self.attend.activate()
+            self.orient.activate( target, cv )
+            time.sleep(0.02)
+            
 
 if __name__ == "__main__":
     
     main = Client(sys.argv[1:])
     main.loop()
-
-
-

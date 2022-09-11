@@ -1,16 +1,76 @@
 import numpy as np
+import rospy
+from sensor_msgs.msg import CompressedImage
 import cv2
+from cv_bridge import CvBridge, CvBridgeError
+import os
 
 class Attend:
+    def callback_caml(self, ros_image):
 
-    def __init__(self):
+        self.callback_cam(ros_image, 0)
+
+    def callback_camr(self, ros_image):
+
+        self.callback_cam(ros_image, 1)
+
+    def callback_cam(self, ros_image, imno):
+
+        # silently (ish) handle corrupted JPEG frames
+        try:
+            # convert compressed ROS image to raw CV image
+            self.image[imno] = self.image_converter.compressed_imgmsg_to_cv2(ros_image, "rgb8")
+        except CvBridgeError as e:
+            # print(e)
+            pass
+
+    def __init__(self, show_images = False):
         self.old_frame = [None, None]
         self.old_gray = [None, None]
         self.p0 = [None, None]
         self.color = np.random.randint(0, 255, (100, 3))
+        self.image = [None, None]
+        self.image_w = 640
+        self.image_h = 0
+        self.show_images = show_images
 
+        # ROS -> OpenCV converter
+        self.image_converter = CvBridge()
 
-    def activate(self, im, imageno):
+        # robot name
+        topic_base_name = "/" + os.getenv("MIRO_ROBOT_NAME")
+
+        # subscribe
+        self.sub_caml = rospy.Subscriber(topic_base_name + "/sensors/caml/compressed",
+                                         CompressedImage, self.callback_caml, queue_size=1, tcp_nodelay=True)
+        self.sub_camr = rospy.Subscriber(topic_base_name + "/sensors/camr/compressed",
+                                         CompressedImage, self.callback_camr, queue_size=1, tcp_nodelay=True)
+
+    def activate(self):
+        ip1 = ip2 = None
+        v1 = v2 = 0
+
+        if self.image[0] is not None:
+            ip1, v1 = self.findMovement(self.image[0], 0)
+        if self.image[1] is not None:
+            ip2, v2 = self.findMovement(self.image[1], 1)            
+        
+        target = 0.0
+        cv = 0.0 
+
+        if ip2 is not None or np.abs(v2) > np.abs(v1):
+            target = 0 if ip2 == 0 else 1
+            cv = v2
+        elif ip1 is not None or np.abs(v1) > np.abs(v2):
+            target = -1 if ip1 == 0 else 0
+            cv  = v1
+        else:
+            cv = 0.0
+        
+        self.image = [None, None]
+        return target, cv
+
+    def findMovement(self, im, imageno):
         # Parameters for ShiTomasi corner detection
         # self.kinvel = self.kinvel - 0.8*self.kinvel
 
@@ -70,7 +130,6 @@ class Attend:
             if v < 2:
                 continue
 
-            print(int(c), ", ", self.image_w)
             idx = int(c/(0.5*self.image_w))
             counter[idx if idx <= 1 else 1] += 1
             
@@ -87,19 +146,16 @@ class Attend:
                 
         
         self.p0[imageno] = good_new.reshape(-1, 1, 2)
-
-            # Display the demo
-        img = cv2.add(frame, mask)
-        cv2.imshow(str(imageno), img)
-        # k = cv2.waitKey(25) & 0xFF
-        # if k == 27:
-        #     return
-
         # Update the previous frame and previous points
         self.old_gray[imageno] = frame_gray.copy()
-        # cv2.imshow('frame', im)
-        if(imageno == 1):
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                return target, vf
+
+        if self.show_images:
+            # Display the demo
+            img = cv2.add(frame, mask)
+            cv2.imshow(str(imageno), img)
+            # cv2.imshow('frame', im)
+            if(imageno == 1):
+                if cv2.waitKey(1) & 0xFF == ord('q'):
+                    return target, vf
         return target, vf
 
