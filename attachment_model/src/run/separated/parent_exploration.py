@@ -10,6 +10,7 @@ sys.path.append('../../')
 # import subscription modules
 from actions.explore import ParentExplore
 from subscribers.action_sub import ParentAction
+from sign_stimuli.sign_stimuli import Client
 
 class ParentExploration:
 
@@ -17,6 +18,7 @@ class ParentExploration:
         rospy.init_node('child_exploration')
         self.parent_explore = ParentExplore()
         self.action = ParentAction()
+        self.still_explore = Client()
 
     def run(self):
         # to explore
@@ -26,8 +28,9 @@ class ParentExploration:
     
     def still_run(self):
         while not rospy.is_shutdown():
-            print("Exploring")
-            # add function to find MiRo
+            if self.action.parent == 0:
+                print("Looking for child")
+                self.still_explore.loop()
 
 if __name__ == "__main__":
     exploration = ParentExploration()

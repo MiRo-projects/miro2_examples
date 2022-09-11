@@ -37,6 +37,8 @@ class GesturesPub(object):
         self.pos_tail += self.pos_tail_speed
 
     def change_color(self):
+        print(self.controller.child)
+        print(self.controller.emotional_distance)
         self.tail_pos_calc()
         self.wag_pos = np.sin(self.pos_tail)
         self.general_pub.set_cos_joint(wag=self.wag_pos)
