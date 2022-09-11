@@ -37,7 +37,6 @@ class MoveState(State):
 
         self. t += 0.8
 
-
         if self.t > 50.0: 
             return RelaxState(self.target, self.vel)
 
