@@ -27,7 +27,7 @@ class ChildApproacher:
     def run(self):
         # to explore
         while not rospy.is_shutdown():
-            if self.action.child == 1:
+            if self.action.child == 0:
                 if self.approach.condition_satisfied == True:
                     self.sound.initiating = True
                     self.pub_sound.publish(self.sound)

@@ -25,6 +25,7 @@ class ListeningActions(object):
         self.speaker = controller(sys.argv[1:])
         self.listener = RosCooDetection()
         self.care = Care()
+        self.sound_heard = Care()
         self.current_accumulation = starting_accumulation
         self.listener.set_accumulation(starting_accumulation)
 
@@ -73,19 +74,24 @@ class ChildListening(ListeningActions):
     def __init__(self):
         starting_accumulation = 0.00
         self.care_detection = rospy.Publisher('/child/care_detection', Care, queue_size=0)
+        self.sound_detection = rospy.Publisher('/child/sound_detected', Care, queue_size=0)
         super().__init__(starting_accumulation)
 
     def action(self):
         # see if care needs to be given
         if self.current_accumulation <= self.threshold1:
+            self.sound_heard.initiating = False
             print("Stuck below threshold 0.05: " + str(self.current_accumulation))
             self.action_init()
         elif self.current_accumulation >= self.threshold2:
+            self.sound_heard.initiating = True
             print(self.current_accumulation)
             self.action_two()
         else:
+            self.sound_heard.initiating = True
             print("Threshold 0.05 exceeded: " + str(self.current_accumulation))
             self.action_one()
+        self.sound_detection.publish(self.sound_heard)
         # publish care after each iteration
         self.care_detection.publish(self.care)
 

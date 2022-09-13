@@ -23,12 +23,12 @@ class ParentExploration:
     def run(self):
         # to explore
         while not rospy.is_shutdown():
-            if self.action.parent == 0:
+            if self.action.parent == 1:
                 self.parent_explore.explore()
     
     def still_run(self):
         while not rospy.is_shutdown():
-            if self.action.parent == 0:
+            if self.action.parent == 1:
                 print("Looking for child")
                 self.still_explore.loop()
 

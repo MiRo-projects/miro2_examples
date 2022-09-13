@@ -31,13 +31,13 @@ class ChildData(object):
     def run(self):
         while not rospy.is_shutdown():
             self.store_data()
-        with open('.gitignore/child/pos_data.npy', 'wb') as f:
+        with open('.gitignore/child_pos_data.npy', 'wb') as f:
             np.save(f, self.pos_data)
-        with open('.gitignore/child/need.npy', 'wb') as f:
+        with open('.gitignore/child_need.npy', 'wb') as f:
             np.save(f, self.need)
-        with open('.gitignore/child/emotional_distance.npy', 'wb') as f:
+        with open('.gitignore/child_emotional_distance.npy', 'wb') as f:
             np.save(f, self.emotional_distance)
-        with open('.gitignore/child/physical_distance.npy', 'wb') as f:
+        with open('.gitignore/child_physical_distance.npy', 'wb') as f:
             np.save(f, self.physical_distance)
         
 

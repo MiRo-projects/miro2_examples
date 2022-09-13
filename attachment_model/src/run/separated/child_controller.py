@@ -14,7 +14,7 @@ class ChildControl():
     
     def __init__(self):
         rospy.init_node("child_controller")
-        self.controller = ChildController(0,0)
+        self.controller = ChildController(0, 0.35)
 
     def run(self):
         self.controller.central_control()

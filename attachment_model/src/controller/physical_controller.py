@@ -61,7 +61,9 @@ class PhysicalController(object):
         self.update_distance()
         # Calculate physical distance
         self.dp = self.calculate_physical_distance()
-        self.dp = 1 - np.exp(-2*self.dp)
+        print("DAVID IS GONE", self.dp)
+        k = -np.log(1.0/9.0)
+        self.dp = 1.0/(1.0 + np.exp(-k*(self.dp-3.0)))
         return self.dp
 
     def physical_distance_time(self):

@@ -21,7 +21,7 @@ class ChildExploration:
     def run(self):
         # to explore
         while not rospy.is_shutdown():
-            if self.action.child == 0:
+            if self.action.child == 1:
                 self.explore.explore()
 
 if __name__ == "__main__":

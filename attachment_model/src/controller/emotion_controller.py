@@ -32,7 +32,7 @@ class BothEmotionController(EmotionController):
             rospy.loginfo('Both satisfied')
             self.de = 0
         else:
-            self.de += ((1.0-self.de)*0.05)
+            self.de += ((1.0-self.de)*0.01)
         return self.de
 
 class ParentEmotionController(EmotionController):
@@ -47,7 +47,7 @@ class ParentEmotionController(EmotionController):
             rospy.loginfo('Parent satisfied')
             self.de = 0
         else:
-            self.de += ((1.0-self.de)*0.05)
+            self.de += ((1.0-self.de)*0.01)
         return self.de
 
 class ChildEmotionController(EmotionController):
@@ -62,5 +62,5 @@ class ChildEmotionController(EmotionController):
             rospy.loginfo('Child satisfied')
             self.de = 0
         else:
-            self.de += ((1.0-self.de)*0.05)
+            self.de += ((1.0-self.de)*0.01)
         return self.de

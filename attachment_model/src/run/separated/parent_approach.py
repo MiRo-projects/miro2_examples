@@ -27,7 +27,7 @@ class ParentApproacher:
     def run(self):
         # to explore
         while not rospy.is_shutdown():
-            if self.action.parent == 1:
+            if self.action.parent == 0:
                 if self.approach.condition_satisfied == True:
                     self.sound.initiating = True
                     print(1)
@@ -43,7 +43,7 @@ class ParentApproacher:
     
     def still_run(self):
         while not rospy.is_shutdown():
-            if self.action.parent == 1:
+            if self.action.parent == 0:
                 self.sound.initiating = True
             else:
                 self.sound.initiating = False
